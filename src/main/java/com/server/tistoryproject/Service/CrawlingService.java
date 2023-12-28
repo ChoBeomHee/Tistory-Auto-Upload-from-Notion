@@ -100,7 +100,7 @@ public class CrawlingService {
         Thread.sleep(14000); // download 기다림
 
         String filePath = "C:\\Users\\tiger\\Downloads";
-        String SavePath = "C:\\Users\\tiger\\OneDrive\\바탕 화면\\TistoryProjectServer\\TistoryProject\\Img_file";
+        String SavePath = "C:\\Users\\tiger\\OneDrive\\바탕 화면\\TistoryProjectServer\\TistoryProject\\src\\main\\resources\\static\\webapp\\Img_file";
 
         File zipFile = new File(filePath);
         File[] zipFiles = zipFile.listFiles((dir, name) -> name.endsWith(".zip"));
@@ -116,15 +116,18 @@ public class CrawlingService {
             System.out.println("가장 최근에 다운로드된 zip 파일: " + mostRecentZipFile.getAbsolutePath());
             ZipFileAbs = mostRecentZipFile.getAbsolutePath();
         }
-        Unzip(ZipFileAbs, SavePath);
+        String names = Unzip(ZipFileAbs, SavePath);
+        String[] FILENAME = names.split("/");
+        post.setDownload_filename(FILENAME[0]);
         driver.close();
         driver.quit();
 
         return post;
     }
 
-    public void Unzip(String ZipFilePath, String DestFilePath) throws IOException{
+    public String Unzip(String ZipFilePath, String DestFilePath) throws IOException{
         File Destination_dir = new File(DestFilePath);
+        String name ="";
         if(!Destination_dir.exists()){
             Destination_dir.mkdirs();
         }
@@ -133,6 +136,7 @@ public class CrawlingService {
 
         while(zipEntry != null){
             String File_Path = DestFilePath + File.separator + zipEntry.getName();
+            name = zipEntry.getName();
             if(!zipEntry.isDirectory()){
                 extractFile(zipInputStream, File_Path);
             }else{
@@ -143,6 +147,8 @@ public class CrawlingService {
             zipEntry = zipInputStream.getNextEntry();
         }
         zipInputStream.close();
+
+        return name;
     }
 
     public void extractFile(ZipInputStream zipInputStream, String File_Path) throws IOException {

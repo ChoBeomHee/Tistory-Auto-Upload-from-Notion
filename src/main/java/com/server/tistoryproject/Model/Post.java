@@ -6,4 +6,5 @@ import lombok.Data;
 public class Post {
     String title;
     String content;
+    String download_filename;
 }
