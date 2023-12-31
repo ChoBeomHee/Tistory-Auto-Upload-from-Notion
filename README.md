@@ -7,8 +7,11 @@
 
 # Stack
 front-end : 크롬 확장 프로그램 / JavaScript
+
 back-end : Spring Boot
+
 using tool : Selenium, Tistory API
+
 ![image](https://github.com/ChoBeomHee/Tistory-Auto-Upload-from-Notion/assets/68563167/178101d0-c60a-4972-a1ca-5b6c4837a4a1)
 
 크롬 확장 프로그램에 내장된 자바스크립트 코드에서 Spring Boot 서버에 HTTP 요청을 보내면 Spring Boot에서 노션 페이지를 크롤링하고 티스토리에 자동 업로드 해줍니다.
