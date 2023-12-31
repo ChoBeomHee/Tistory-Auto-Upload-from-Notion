@@ -2,6 +2,7 @@ package com.server.tistoryproject.Service;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.server.tistoryproject.DTO.CategoryDTO;
 import com.server.tistoryproject.Model.Post;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -44,7 +45,7 @@ public class TistoryApiService {
         System.out.println(response);
     }
 
-    public void origin_write(Post post){
+    public void origin_write(Post post, String categoryId){
         String url = "https://www.tistory.com/apis/post/write?";
 //        url += "access_token=" + access_token + "&";
 //        url += "output=" + "json" + "&";
@@ -60,8 +61,7 @@ public class TistoryApiService {
         params.put("blogName", "tigerfrom2");
         params.put("title", post.getTitle());
         params.put("content", post.getContent());
-        params.put("category", "1372431");
-        System.out.println(post.getContent());
+        params.put("category", String.valueOf(categoryId));
         // 헤더 설정
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
@@ -82,7 +82,7 @@ public class TistoryApiService {
         System.out.println("Response Code: " + responseEntity.getStatusCode());
         System.out.println("Response Body: " + responseEntity.getBody());
     }
-    public boolean getCategory(String Category) throws IOException {
+    public CategoryDTO getCategory(String Category) throws IOException {
         RestClient restClient = RestClient.create();
         String url = "https://www.tistory.com/apis/category/list?";
         url += "access_token=" + access_token + "&";
@@ -99,20 +99,24 @@ public class TistoryApiService {
 
         ArrayList<Map> arrayList = (ArrayList<Map>) res_item.get("categories");
         System.out.println(res_item);
-        try {
-            if(!search_category(arrayList, Category)) throw new Exception();
-        }catch (Exception e){
-            return false;
-        }
 
-        return true;
+        return search_category(arrayList, Category);
     }
 
-    boolean search_category(ArrayList<Map> arrayList, String Aim_Category_name){
+    CategoryDTO search_category(ArrayList<Map> arrayList, String Aim_Category_name){
         for (Map map : arrayList) {
-            if (map.get("label").equals(Aim_Category_name)) return true;
+            if (map.get("label").toString().contains(Aim_Category_name)){
+                System.out.println(map.get("label") + "=========================");
+                System.out.println(map.get("id"));
+                CategoryDTO categoryDTO = new CategoryDTO();
+                categoryDTO.setCategory_Name((String) map.get("label"));
+                categoryDTO.setId((String) map.get("id"));
+                System.out.println(categoryDTO.getCategory_Name());
+                System.out.println(categoryDTO.getId());
+                return categoryDTO;
+            }
         }
 
-        return false;
+        return null;
     }
 }

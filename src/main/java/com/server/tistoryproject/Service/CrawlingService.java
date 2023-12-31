@@ -50,6 +50,8 @@ public class CrawlingService {
         options.setPageLoadStrategy(PageLoadStrategy.NORMAL);
         options.setExperimentalOption("debuggerAddress", "127.0.0.1:9222"); // 해당 포트로 selenium 열기
         WebDriver driver = new ChromeDriver(options);
+        Dimension dimension = new Dimension(800, 600);
+        driver.manage().window().setSize(dimension);
         driver.get(url);
         Thread.sleep(10000);
         post.setTitle(driver.getTitle());
@@ -97,7 +99,7 @@ public class CrawlingService {
 //        driver.close();
 //        driver.quit();
 
-        Thread.sleep(14000); // download 기다림
+        Thread.sleep(16000); // download 기다림
 
         String filePath = "C:\\Users\\tiger\\Downloads";
         String SavePath = "C:\\Users\\tiger\\OneDrive\\바탕 화면\\TistoryProjectServer\\TistoryProject\\src\\main\\resources\\static\\webapp\\Img_file";
@@ -150,7 +152,6 @@ public class CrawlingService {
 
         return name;
     }
-
     public void extractFile(ZipInputStream zipInputStream, String File_Path) throws IOException {
         File file = new File(File_Path);
 

@@ -1,5 +1,6 @@
 package com.server.tistoryproject.Controller;
 
+import com.server.tistoryproject.DTO.CategoryDTO;
 import com.server.tistoryproject.Model.Post;
 import com.server.tistoryproject.Service.TistoryApiService;
 import com.server.tistoryproject.Service.HTMLService;
@@ -14,7 +15,7 @@ public class TistoryApiController {
     @Autowired
     private TistoryApiService tistoryApiService;
 
-    @Autowired
+    @Autowired  
     private HTMLService HTMLService;
 
     @Autowired
@@ -23,17 +24,19 @@ public class TistoryApiController {
     @PostMapping("v1/upload") // 동적 페이지 전용
     String test_sel(@RequestParam HashMap<String, String> URL) throws IOException, InterruptedException {
         String url = URL.get("url_info");
+        String category = URL.get("category");
 
         Post post = crawlingController.Selenium(url); // HTML 코드 여기서 가져옴
         Thread.sleep(5000);
 
         post.setContent(HTMLService.HTMLFileLoad(post.getDownload_filename()));
 
-        tistoryApiService.origin_write(post);
+        CategoryDTO categoryDTO = tistoryApiService.getCategory(category);
+
+        tistoryApiService.origin_write(post, categoryDTO.getId());
 
         return "노션 글 티스토리 쓰기";
     }
-
 //    @PostMapping ("/write") // 정적 페이지 전용
 //    String write(@RequestParam HashMap<String, String> userInfo) throws IOException {
 //        Post post = new Post();

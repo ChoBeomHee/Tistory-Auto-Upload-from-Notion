@@ -86,8 +86,6 @@ public class HTMLService {
         if (files != null) {
             for (File file : files) {
                 if (file.isFile() && file.getName().equals(filename + ".html")) {
-                    System.out.println(filename);
-
                     // 확장자가 ".html"인 파일을 찾으면 반환
                     return file;
                 }
