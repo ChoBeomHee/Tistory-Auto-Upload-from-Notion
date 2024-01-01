@@ -15,6 +15,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.NoSuchElementException;
 
 @Service
 public class TistoryApiService {
@@ -98,7 +99,14 @@ public class TistoryApiService {
         Map<String, Map> res_item = (Map<String, Map>) res.get("tistory").get("item");
 
         ArrayList<Map> arrayList = (ArrayList<Map>) res_item.get("categories");
-        System.out.println(res_item);
+
+        try{
+            if(search_category(arrayList, Category) == null){
+                throw new NoSuchElementException("카테고리가 존재하지 않음");
+            }
+        } catch (NoSuchElementException e){
+            return new CategoryDTO("0", "0");
+        }
 
         return search_category(arrayList, Category);
     }

@@ -13,11 +13,6 @@ import java.io.IOException;
 public class CrawlingController {
     @Autowired
     CrawlingService crawlingService;
-
-    @GetMapping("test")
-    void test(){
-        crawlingService.test();
-    }
     public String getContent(String url) throws IOException {
         return crawlingService.getContent(url);
     }

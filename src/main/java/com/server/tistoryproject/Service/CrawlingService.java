@@ -110,12 +110,10 @@ public class CrawlingService {
         String ZipFileAbs = "";
 
         if (zipFiles != null && zipFiles.length > 0) {
-            // 최근에 수정된 파일을 찾기 위해 배열을 수정 시간을 기준으로 정렬
             Arrays.sort(zipFiles, Comparator.comparingLong(File::lastModified).reversed());
 
             // 가장 최근에 수정된 파일 출력
             File mostRecentZipFile = zipFiles[0];
-            System.out.println("가장 최근에 다운로드된 zip 파일: " + mostRecentZipFile.getAbsolutePath());
             ZipFileAbs = mostRecentZipFile.getAbsolutePath();
         }
         String names = Unzip(ZipFileAbs, SavePath);
@@ -170,23 +168,6 @@ public class CrawlingService {
         }
 
         bufferedOutputStream.close();
-    }
-
-    public void switch_img_url(WebDriver origin){
-        Set<String> windowHandles = origin.getWindowHandles();
-
-        for (String handle : windowHandles) {
-            origin.switchTo().window(handle);
-        }
-    }
-
-    public void switch_main_url(WebDriver img){
-        Set<String> windowHandles = img.getWindowHandles();
-
-        for (String handle : windowHandles) {
-            img.switchTo().window(handle);
-            break;
-        }
     }
 
     public void test(){
