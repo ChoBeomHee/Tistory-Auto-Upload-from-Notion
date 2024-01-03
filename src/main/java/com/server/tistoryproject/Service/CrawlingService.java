@@ -26,14 +26,20 @@ public class CrawlingService {
         System.out.println("주소 ==================== " + url);
         Document document = Jsoup.connect(url).get();
 
-        System.out.println(document);
-
         Elements contentElement;
-        contentElement = document.select("div[class=article_view]");
-
-        System.out.println("loglogloglog ========================== " + contentElement);
+        contentElement = document.select("div[class=page-body]");
         contentElement.select("div.another_category").remove();
         contentElement.select("div.container_postbtn").remove();
+        contentElement.select("p").attr("data-ke-size", "size16");
+    //        contentElement.select("ul").unwrap();
+    //        contentElement.select("ol").unwrap();
+    //        contentElement.select("figure").unwrap();
+    //        contentElement.select("pre").unwrap();
+    //        contentElement.select("article").unwrap();
+
+        //contentElement.select(":not(li)").remove();
+
+
         System.out.println();
         System.out.println();
         System.out.println("=============" + contentElement);
@@ -60,7 +66,8 @@ public class CrawlingService {
         driver.findElement(By.xpath("/html/body/div[1]/div/div[2]/div[2]/div/div[2]/div[2]/div/div/div/div/div/div[1]/div[7]/div[2]")).click();
 //        driver.findElement(By.xpath("/html/body/div[1]/div/div[2]/div[2]/div/div[2]/div/div[1]/div[2]/svg")).click();
 //        driver.findElement(By.xpath("/html/body/div[1]/div/div[2]/div[3]/div/div[2]/div[2]/div/div/div/div/div/div/div/div[2]/div")).click();
-        Thread.sleep(1000);
+        Thread.sleep(2000);
+
         driver.findElement(By.xpath("/html/body/div[1]/div/div[2]/div[2]/div/div[2]/div/div[7]/div[2]")).click();
 //        ArrayList<WebElement> contents;
 //        contents = (ArrayList<WebElement>) driver.findElements(By.className("notion-page-content"));

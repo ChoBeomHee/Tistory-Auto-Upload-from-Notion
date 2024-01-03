@@ -1,9 +1,16 @@
 package com.server.tistoryproject.Service;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.server.tistoryproject.DTO.CategoryDTO;
+import com.server.tistoryproject.DTO.CategoryListDTO;
+import com.server.tistoryproject.DTO.ModifyDTO;
 import com.server.tistoryproject.Model.Post;
+import com.server.tistoryproject.Model.TistoryTokenInfo;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
+import org.openqa.selenium.json.Json;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -17,9 +24,12 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.NoSuchElementException;
 
+import static com.server.tistoryproject.Model.TistoryTokenInfo.*;
+
 @Service
 public class TistoryApiService {
-    String access_token = "122a39501e16815a3067134136cf126f_f32160a6fadafb76e165c7fad39c64ad";
+    @Autowired
+    CrawlingService crawlingService;
     public String getToken(String Code){
         String url = "https://www.tistory.com/oauth/access_token?"
                 + "client_id=" + "4b0b689fe13b9041ca50a4fe7cef06fc" + "&"
@@ -46,23 +56,17 @@ public class TistoryApiService {
         System.out.println(response);
     }
 
-    public void origin_write(Post post, String categoryId){
+    public void origin_write(Post post, String categoryId) throws ParseException, IOException {
         String url = "https://www.tistory.com/apis/post/write?";
-//        url += "access_token=" + access_token + "&";
-//        url += "output=" + "json" + "&";
-//        url += "blogName=" + "tigerfrom2" + "&";
-//        url += "title=" + post.getTitle() + "&";
-//        url += "content=" + post.getContent() + "&";
-//        url += "category=1372431";
-        // 요청할 데이터 (JSON 예제)
 
         Map<String, Object> params = new HashMap<>();
         params.put("access_token", access_token);
-        params.put("output", "json");
-        params.put("blogName", "tigerfrom2");
+        params.put("output", output);
+        params.put("blogName", blogName);
         params.put("title", post.getTitle());
         params.put("content", post.getContent());
         params.put("category", String.valueOf(categoryId));
+        params.put("visibility", visibility);
         // 헤더 설정
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
@@ -80,51 +84,95 @@ public class TistoryApiService {
                 String.class
         );
 
-        System.out.println("Response Code: " + responseEntity.getStatusCode());
-        System.out.println("Response Body: " + responseEntity.getBody());
+        System.out.println(responseEntity.getBody());
+
+        JSONParser jsonParser = new JSONParser();
+        JSONObject jsonObject = (JSONObject) jsonParser.parse(responseEntity.getBody());
+        JSONObject value = (JSONObject) jsonObject.get("tistory");
+        ModifyDTO modifyDTO = new ModifyDTO((String) value.get("postId"), post.getTitle(), (String) value.get("url"));
+
+        post_modify(modifyDTO);
     }
-    public CategoryDTO getCategory(String Category) throws IOException {
+    public CategoryDTO getCategory(String Category) throws IOException, ParseException {
         RestClient restClient = RestClient.create();
         String url = "https://www.tistory.com/apis/category/list?";
         url += "access_token=" + access_token + "&";
         url += "output=" + "json" + "&";
         url += "blogName=" + "tigerfrom2";
 
-        String response = (restClient.get().uri(url).accept(MediaType.APPLICATION_JSON).
-                retrieve().toEntity(String.class).getBody());
-        ObjectMapper objectMapper = new ObjectMapper();
-        Map<String, Map> res = objectMapper.readValue(response, new TypeReference<>() {
-        });
+//        String response = (restClient.get().uri(url).accept(MediaType.APPLICATION_JSON).
+//                retrieve().toEntity(String.class).getBody());
 
-        Map<String, Map> res_item = (Map<String, Map>) res.get("tistory").get("item");
+        String response = restClient.get()
+                .uri(url)
+                .retrieve()
+                .body(String.class);
 
-        ArrayList<Map> arrayList = (ArrayList<Map>) res_item.get("categories");
+        JSONParser jsonParser = new JSONParser();
+        JSONObject jsonObject = (JSONObject) jsonParser.parse(response);
+        JSONObject Tistory_Information = (JSONObject) jsonObject.get("tistory");
+        JSONObject Items = (JSONObject) Tistory_Information.get("item");
+        JSONArray CategoryArray = (JSONArray) Items.get("categories");
 
-        try{
-            if(search_category(arrayList, Category) == null){
+        CategoryListDTO categoryListDTO = new CategoryListDTO(CategoryArray);
+        CategoryDTO categoryDTO = search_category(categoryListDTO.getCategories(), Category);
+        try {
+            if (categoryDTO == null) {
                 throw new NoSuchElementException("카테고리가 존재하지 않음");
             }
-        } catch (NoSuchElementException e){
+        } catch (NoSuchElementException e) {
             return new CategoryDTO("0", "0");
         }
 
-        return search_category(arrayList, Category);
+        return categoryDTO;
     }
 
-    CategoryDTO search_category(ArrayList<Map> arrayList, String Aim_Category_name){
-        for (Map map : arrayList) {
-            if (map.get("label").toString().contains(Aim_Category_name)){
-                System.out.println(map.get("label") + "=========================");
-                System.out.println(map.get("id"));
+    CategoryDTO search_category(ArrayList<CategoryListDTO.Category> arrayList, String Category_name){
+        for (CategoryListDTO.Category category : arrayList) {
+            if (category.getLabel().contains(Category_name)){
                 CategoryDTO categoryDTO = new CategoryDTO();
-                categoryDTO.setCategory_Name((String) map.get("label"));
-                categoryDTO.setId((String) map.get("id"));
-                System.out.println(categoryDTO.getCategory_Name());
-                System.out.println(categoryDTO.getId());
+
+                categoryDTO.setCategory_Name(category.getLabel());
+                categoryDTO.setId(category.getId());
+
                 return categoryDTO;
             }
         }
 
         return null;
+    }
+
+    void post_modify(ModifyDTO modifyDTO) throws IOException, ParseException {
+        String url = "https://www.tistory.com/apis/post/modify?";
+        String id = modifyDTO.getPostId();
+        String title = modifyDTO.getTitle();
+        String content = crawlingService.getContent(modifyDTO.getUrl());
+
+        Map<String, Object> params = new HashMap<>();
+        params.put("access_token", access_token);
+        params.put("output", output);
+        params.put("blogName", blogName);
+        params.put("content", content + "*이 글은 노션에서 자동으로 업로드 되었습니다.*");
+        params.put("title", title);
+        params.put("postId", id);
+        params.put("visibility", visibility);
+
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        HttpEntity<Map<String, Object>> requestEntity = new HttpEntity<>(params, headers);
+
+        RestTemplate restTemplate = new RestTemplate();
+
+        ResponseEntity<String> responseEntity = restTemplate.exchange(
+                url,
+                HttpMethod.POST,
+                requestEntity,
+                String.class
+        );
+        System.out.println(responseEntity.getBody());
+
+        System.out.println("글 튜닝");
     }
 }

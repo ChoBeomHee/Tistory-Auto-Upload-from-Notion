@@ -17,8 +17,6 @@ public class HTMLService {
         String directoryPath = "C:\\Users\\tiger\\OneDrive\\바탕 화면\\TistoryProjectServer\\TistoryProject\\src\\main\\resources\\static\\webapp\\Img_file";
         System.out.println(fileName);
         File HTMLfile = findHTMLFile(directoryPath, fileName);
-        System.out.println("=====================================");
-        System.out.println("HTML SERVICE == " + HTMLfile.getName());
         String HTML_FILE_NAME = findHTMLFile_NAME(directoryPath).replace(".html", "");
         System.out.println(HTML_FILE_NAME);
         String HTML_CODE = readHTMLFileContent(HTMLfile);

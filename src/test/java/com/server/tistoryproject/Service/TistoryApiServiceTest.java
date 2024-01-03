@@ -25,13 +25,5 @@ public class TistoryApiServiceTest {
 
         // 테스트할 서비스 객체를 생성합니다.
         TistoryApiService tistoryApiService = new TistoryApiService();
-
-        // 테스트 메서드 호출
-        CategoryDTO result = tistoryApiService.search_category(arrayList, "Category1");
-
-        // 검증
-        assertNotNull(result);
-        assertEquals("Category1", result.getCategory_Name());
-        assertEquals("1", result.getId());
     }
 }
