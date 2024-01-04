@@ -101,9 +101,6 @@ public class TistoryApiService {
         url += "output=" + "json" + "&";
         url += "blogName=" + "tigerfrom2";
 
-//        String response = (restClient.get().uri(url).accept(MediaType.APPLICATION_JSON).
-//                retrieve().toEntity(String.class).getBody());
-
         String response = restClient.get()
                 .uri(url)
                 .retrieve()
