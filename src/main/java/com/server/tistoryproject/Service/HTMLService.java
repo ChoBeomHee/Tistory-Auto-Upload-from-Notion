@@ -1,10 +1,14 @@
 package com.server.tistoryproject.Service;
 
+import com.server.tistoryproject.Config.WebMvcConfig;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 
+import javax.swing.text.html.HTML;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -13,6 +17,8 @@ import java.util.Arrays;
 
 @Service
 public class HTMLService {
+    @Autowired
+    WebMvcConfig webMvcConfig;
     public String HTMLFileLoad(String fileName){
         String directoryPath = "C:\\Users\\tiger\\OneDrive\\바탕 화면\\TistoryProjectServer\\TistoryProject\\src\\main\\resources\\static\\webapp\\Img_file";
         System.out.println(fileName);
@@ -29,16 +35,15 @@ public class HTMLService {
         for(int i = 0; i < img_elements.size(); i++){
             String[] img_name = img_elements.get(i).attr("src").split("/");
 
-            String newSrc = "http://localhost:8080/image/?FolderName="
-                    + HTML_FILE_NAME + "&"
-                    + "FileName=" + img_name[img_name.length - 1];
+//            String newSrc = "http://localhost:8080/image/?FolderName="
+//                    + HTML_FILE_NAME + "&"
+//                    + "FileName=" + img_name[img_name.length - 1];
+            String newSrc = "http://localhost:8080/image/" + HTML_FILE_NAME + "/" + img_name[img_name.length - 1];
             System.out.println(img_name[img_name.length - 1]);
             img_elements.get(i).attr("src", newSrc);
             a_elements.get(i).attr("href", newSrc);
             System.out.println(newSrc);
         }
-
-        System.out.println(document);
 
         return document.toString();
     }

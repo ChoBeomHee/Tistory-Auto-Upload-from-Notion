@@ -38,12 +38,6 @@ public class CrawlingService {
     //        contentElement.select("article").unwrap();
 
         //contentElement.select(":not(li)").remove();
-
-
-        System.out.println();
-        System.out.println();
-        System.out.println("=============" + contentElement);
-
         return contentElement.toString();
     }
     public Post crawlingSelenium(String url) throws InterruptedException, IOException {
@@ -54,10 +48,11 @@ public class CrawlingService {
         Runtime.getRuntime().exec("C:/Program Files/Google/Chrome/Application/chrome.exe --remote-debugging-port=9222 --user-data-dir=\"C:/Selenium/ChromeData\""); // 크롬 디버깅 모드
         ChromeOptions options = new ChromeOptions();
         options.setPageLoadStrategy(PageLoadStrategy.NORMAL);
+        options.addArguments("--headless");
         options.setExperimentalOption("debuggerAddress", "127.0.0.1:9222"); // 해당 포트로 selenium 열기
+
         WebDriver driver = new ChromeDriver(options);
-        Dimension dimension = new Dimension(800, 600);
-        driver.manage().window().setSize(dimension);
+
         driver.get(url);
         Thread.sleep(10000);
         post.setTitle(driver.getTitle());
@@ -109,8 +104,8 @@ public class CrawlingService {
         Thread.sleep(16000); // download 기다림
 
         String filePath = "C:\\Users\\tiger\\Downloads";
-        String SavePath = "C:\\Users\\tiger\\OneDrive\\바탕 화면\\TistoryProjectServer\\TistoryProject\\src\\main\\resources\\static\\webapp\\Img_file";
-
+        //String SavePath = "C:\\Users\\tiger\\OneDrive\\바탕 화면\\TistoryProjectServer\\TistoryProject\\src\\main\\resources\\static\\webapp\\Img_file";
+        String SavePath = "C:\\TistoryImages";
         File zipFile = new File(filePath);
         File[] zipFiles = zipFile.listFiles((dir, name) -> name.endsWith(".zip"));
 
@@ -179,13 +174,9 @@ public class CrawlingService {
 
     public void test(){
         System.setProperty("webdriver.chrome.driver", "chromedriver.exe");
-
         WebDriver driver = new ChromeDriver();
-
         driver.get("https://www.naver.com/");
-
         System.out.println(driver.getPageSource());
-
         driver.quit();
     }
 

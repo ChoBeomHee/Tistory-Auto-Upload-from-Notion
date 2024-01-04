@@ -9,8 +9,8 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 public class WebMvcConfig implements WebMvcConfigurer {
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry){
-        String resourcePath = "file:///home/uploadedImage";
-        String connectPath = "/image/**";
+        String resourcePath = "file:///TistoryImages/";
+        String connectPath = "/image/{subfolder}/**";
         registry.addResourceHandler(connectPath)
                 .addResourceLocations(resourcePath);
     }

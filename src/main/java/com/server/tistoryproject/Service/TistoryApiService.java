@@ -17,6 +17,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
 import org.springframework.http.*;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.UriComponents;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -43,7 +45,6 @@ public class TistoryApiService {
         System.out.println("==================토큰" + Token);
         return Token;
     }
-
     public void write(){
         String Url = "";
         RestClient restClient = RestClient.create();
@@ -107,6 +108,7 @@ public class TistoryApiService {
                 .uri(url)
                 .retrieve()
                 .body(String.class);
+
 
         JSONParser jsonParser = new JSONParser();
         JSONObject jsonObject = (JSONObject) jsonParser.parse(response);
